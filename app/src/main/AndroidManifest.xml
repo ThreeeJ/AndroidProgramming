@@ -33,9 +33,6 @@
         <activity
             android:name=".CategoryManagementActivity"
             android:exported="false" />
-        <activity
-            android:name=".MyPageActivity"
-            android:exported="false" />
     </application>
 
 </manifest>
