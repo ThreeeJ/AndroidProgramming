@@ -40,10 +40,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val fragment = when (item.itemId) {
             R.id.navigation_home -> createHomeFragment()
-            R.id.navigation_analysis -> {
-                Toast.makeText(this, "분석 화면 준비 중", Toast.LENGTH_SHORT).show()
-                return false
-            }
+            R.id.navigation_analysis -> createAnalysisFragment()
             R.id.navigation_mypage -> createMyPageFragment()
             else -> return false
         }
@@ -51,15 +48,25 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         return loadFragment(fragment)
     }
 
-    private fun createHomeFragment() = HomeFragment.newInstance().apply {
-        arguments = Bundle().apply {
-            putString("username", username)
+    private fun createHomeFragment(): Fragment {
+        return HomeFragment.newInstance().apply {
+            arguments = Bundle().apply {
+                putString("username", username)
+            }
         }
     }
 
-    private fun createMyPageFragment() = MyPageFragment.newInstance().apply {
-        arguments = Bundle().apply {
-            putString("username", username)
+    private fun createAnalysisFragment(): Fragment {
+        val homeFragment = supportFragmentManager.fragments.firstOrNull { it is HomeFragment } as? HomeFragment
+        val selectedDate = homeFragment?.getSelectedDate()
+        return AnalysisFragment.newInstance(username, selectedDate)
+    }
+
+    private fun createMyPageFragment(): Fragment {
+        return MyPageFragment().apply {
+            arguments = Bundle().apply {
+                putString("username", username)
+            }
         }
     }
 

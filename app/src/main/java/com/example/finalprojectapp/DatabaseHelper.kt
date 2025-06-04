@@ -690,4 +690,85 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             -1
         }
     }
+
+    // 일별 카테고리별 지출 데이터 조회
+    fun getDailyExpenseByCategory(date: String): Map<String, Float> {
+        val categoryExpenses = mutableMapOf<String, Float>()
+        val db = this.readableDatabase
+        
+        val query = """
+            SELECT c.name as category_name, SUM(t.amount) as total_amount
+            FROM $TABLE_TRANSACTIONS t
+            JOIN $TABLE_CATEGORIES c ON t.$COLUMN_TRANSACTION_CATEGORY_ID = c.$COLUMN_CATEGORY_ID
+            WHERE t.$COLUMN_TRANSACTION_DATE = ?
+            AND t.$COLUMN_TRANSACTION_TYPE = 'expense'
+            GROUP BY c.$COLUMN_CATEGORY_ID, c.name
+            ORDER BY total_amount DESC
+        """.trimIndent()
+        
+        val cursor = db.rawQuery(query, arrayOf(date))
+        cursor.use {
+            while (it.moveToNext()) {
+                val categoryName = it.getString(it.getColumnIndexOrThrow("category_name"))
+                val amount = it.getFloat(it.getColumnIndexOrThrow("total_amount"))
+                categoryExpenses[categoryName] = amount
+            }
+        }
+        
+        return categoryExpenses
+    }
+
+    // 월별 카테고리별 지출 데이터 조회
+    fun getMonthlyExpenseByCategory(yearMonth: String): Map<String, Float> {
+        val categoryExpenses = mutableMapOf<String, Float>()
+        val db = this.readableDatabase
+        
+        val query = """
+            SELECT c.name as category_name, SUM(t.amount) as total_amount
+            FROM $TABLE_TRANSACTIONS t
+            JOIN $TABLE_CATEGORIES c ON t.$COLUMN_TRANSACTION_CATEGORY_ID = c.$COLUMN_CATEGORY_ID
+            WHERE substr(t.$COLUMN_TRANSACTION_DATE, 1, 7) = ?
+            AND t.$COLUMN_TRANSACTION_TYPE = 'expense'
+            GROUP BY c.$COLUMN_CATEGORY_ID, c.name
+            ORDER BY total_amount DESC
+        """.trimIndent()
+        
+        val cursor = db.rawQuery(query, arrayOf(yearMonth))
+        cursor.use {
+            while (it.moveToNext()) {
+                val categoryName = it.getString(it.getColumnIndexOrThrow("category_name"))
+                val amount = it.getFloat(it.getColumnIndexOrThrow("total_amount"))
+                categoryExpenses[categoryName] = amount
+            }
+        }
+        
+        return categoryExpenses
+    }
+
+    // 연간 카테고리별 지출 데이터 조회
+    fun getYearlyExpenseByCategory(year: String): Map<String, Float> {
+        val categoryExpenses = mutableMapOf<String, Float>()
+        val db = this.readableDatabase
+        
+        val query = """
+            SELECT c.name as category_name, SUM(t.amount) as total_amount
+            FROM $TABLE_TRANSACTIONS t
+            JOIN $TABLE_CATEGORIES c ON t.$COLUMN_TRANSACTION_CATEGORY_ID = c.$COLUMN_CATEGORY_ID
+            WHERE t.$COLUMN_TRANSACTION_DATE LIKE '$year%'
+            AND t.$COLUMN_TRANSACTION_TYPE = 'expense'
+            GROUP BY c.$COLUMN_CATEGORY_ID, c.name
+            ORDER BY total_amount DESC
+        """.trimIndent()
+        
+        val cursor = db.rawQuery(query, arrayOf())
+        cursor.use {
+            while (it.moveToNext()) {
+                val categoryName = it.getString(it.getColumnIndexOrThrow("category_name"))
+                val amount = it.getFloat(it.getColumnIndexOrThrow("total_amount"))
+                categoryExpenses[categoryName] = amount
+            }
+        }
+        
+        return categoryExpenses
+    }
 } 

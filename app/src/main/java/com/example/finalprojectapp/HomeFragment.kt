@@ -474,6 +474,11 @@ class HomeFragment : Fragment() {
         }
     }
 
+    fun getSelectedDate(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+        return dateFormat.format(selectedDate.time)
+    }
+
     companion object {
         fun newInstance() = HomeFragment()
     }
