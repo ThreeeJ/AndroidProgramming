@@ -11,7 +11,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "UserDB"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
 
         // Users table
         private const val TABLE_USERS = "users"
@@ -331,13 +331,28 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     fun deleteTransaction(id: Int): Int {
+        var result = 0
         val db = this.writableDatabase
-        val result = db.delete(
-            TABLE_TRANSACTIONS,
-            "$COLUMN_TRANSACTION_ID = ?",
-            arrayOf(id.toString())
-        )
-        db.close()
+        db.beginTransaction()
+        try {
+            result = db.delete(
+                TABLE_TRANSACTIONS,
+                "$COLUMN_TRANSACTION_ID = ?",
+                arrayOf(id.toString())
+            )
+            if (result > 0) {
+                db.setTransactionSuccessful()
+                android.util.Log.d(TAG, "거래 내역 삭제 성공: ID=$id")
+            } else {
+                android.util.Log.e(TAG, "거래 내역 삭제 실패: ID=$id")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "거래 내역 삭제 중 오류 발생: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
         return result
     }
 
@@ -503,21 +518,27 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var expense = 0
         val db = this.readableDatabase
         
-        val query = """
-            SELECT t.type, SUM(t.amount) as total
-            FROM $TABLE_TRANSACTIONS t
-            WHERE t.$COLUMN_TRANSACTION_DATE = ?
-            GROUP BY t.type
-        """.trimIndent()
-        
-        val cursor = db.rawQuery(query, arrayOf(date))
-        cursor.use {
-            while (it.moveToNext()) {
-                val type = it.getString(it.getColumnIndexOrThrow("type"))
-                val total = it.getInt(it.getColumnIndexOrThrow("total"))
-                if (type == "income") income = total
-                else if (type == "expense") expense = total
+        try {
+            val query = """
+                SELECT t.type, SUM(t.amount) as total
+                FROM $TABLE_TRANSACTIONS t
+                WHERE t.$COLUMN_TRANSACTION_DATE = ?
+                GROUP BY t.type
+            """.trimIndent()
+            
+            val cursor = db.rawQuery(query, arrayOf(date))
+            cursor.use {
+                while (it.moveToNext()) {
+                    val type = it.getString(it.getColumnIndexOrThrow("type"))
+                    val total = it.getInt(it.getColumnIndexOrThrow("total"))
+                    if (type == "income") income = total
+                    else if (type == "expense") expense = total
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
         }
         
         return Pair(income, expense)
@@ -585,5 +606,88 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             }
         }
         return transactions
+    }
+
+    // 사용자 이름 가져오기
+    fun getUserName(username: String): String {
+        val db = this.readableDatabase
+        var name = ""
+        val cursor = db.query(
+            TABLE_USERS,
+            arrayOf(COLUMN_NAME),
+            "$COLUMN_USERNAME = ?",
+            arrayOf(username),
+            null, null, null
+        )
+        
+        if (cursor.moveToFirst()) {
+            name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME))
+        }
+        cursor.close()
+        return name
+    }
+
+    // 사용자 이름 업데이트
+    fun updateUserName(username: String, newName: String): Int {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_NAME, newName)
+        }
+        
+        return db.update(
+            TABLE_USERS,
+            values,
+            "$COLUMN_USERNAME = ?",
+            arrayOf(username)
+        )
+    }
+
+    // 회원 탈퇴 (사용자와 관련된 모든 데이터 삭제)
+    fun deleteUser(username: String): Boolean {
+        val db = this.writableDatabase
+        db.beginTransaction()
+        try {
+            // 1. 사용자의 거래 내역 삭제
+            val userId = getUserId(username)
+            if (userId != -1) {
+                db.delete(TABLE_TRANSACTIONS, null, null)
+            }
+
+            // 2. 사용자 삭제
+            val result = db.delete(
+                TABLE_USERS,
+                "$COLUMN_USERNAME = ?",
+                arrayOf(username)
+            )
+
+            if (result > 0) {
+                db.setTransactionSuccessful()
+                return true
+            }
+            return false
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    // 사용자 ID 가져오기
+    private fun getUserId(username: String): Int {
+        val db = this.readableDatabase
+        val cursor = db.query(
+            TABLE_USERS,
+            arrayOf(COLUMN_ID),
+            "$COLUMN_USERNAME = ?",
+            arrayOf(username),
+            null, null, null
+        )
+        
+        return if (cursor.moveToFirst()) {
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
+            cursor.close()
+            id
+        } else {
+            cursor.close()
+            -1
+        }
     }
 } 

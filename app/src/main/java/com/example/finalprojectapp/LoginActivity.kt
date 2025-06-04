@@ -63,8 +63,8 @@ class LoginActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         // 로그인 버튼
         binding.buttonLogin.setOnClickListener {
-            val username = etUsername.text.toString()
-            val password = etPassword.text.toString()
+            val username = binding.editTextId.text.toString()
+            val password = binding.editTextPassword.text.toString()
 
             if (username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "아이디와 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show()
@@ -72,12 +72,11 @@ class LoginActivity : AppCompatActivity() {
             }
 
             if (dbHelper.validateUser(username, password)) {
-                // 로그인 성공
                 Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                intent.putExtra("username", username)
                 startActivity(intent)
-                finish() // LoginActivity 종료
+                finish()
             } else {
                 Toast.makeText(this, "아이디 또는 비밀번호가 일치하지 않습니다", Toast.LENGTH_SHORT).show()
             }
