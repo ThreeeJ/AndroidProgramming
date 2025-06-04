@@ -16,14 +16,15 @@
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.55">
 
         <EditText
             android:id="@+id/editTextName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="#CCFFFFFF"
+            android:background="@drawable/edit_text_background_normal"
             android:hint="이름"
             android:padding="15dp" />
 
@@ -38,7 +39,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#CCFFFFFF"
+                android:background="@drawable/edit_text_background_normal"
                 android:hint="아이디"
                 android:padding="15dp" />
 
@@ -66,7 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="#CCFFFFFF"
+            android:background="@drawable/edit_text_background_normal"
             android:hint="비밀번호"
             android:inputType="textPassword"
             android:padding="15dp" />
@@ -75,11 +76,28 @@
             android:id="@+id/editTextConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:background="#CCFFFFFF"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/edit_text_background_normal"
             android:hint="비밀번호 확인"
             android:inputType="textPassword"
             android:padding="15dp" />
+
+        <!-- 비밀번호 일치 여부 메시지를 담을 고정 높이 컨테이너 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="40dp">
+
+            <TextView
+                android:id="@+id/tvPasswordMatch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+        </FrameLayout>
 
         <Button
             android:id="@+id/buttonRegisterSubmit"
