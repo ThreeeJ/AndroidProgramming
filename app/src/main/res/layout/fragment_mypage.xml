@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/profile_background"
+            android:background="@drawable/background_section"
             android:padding="16dp"
             android:layout_marginBottom="16dp">
 
@@ -27,7 +27,7 @@
                 android:text="마이페이지"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
+                android:textColor="#1150AB"
                 android:gravity="center"
                 android:layout_marginBottom="16dp"/>
 
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/username_background"
+                android:background="@drawable/background_item"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp">
 
@@ -44,7 +44,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@android:drawable/ic_menu_myplaces"
-                    android:tint="#666666"
+                    app:tint="#1150AB"
                     android:layout_marginEnd="12dp"/>
 
                 <LinearLayout
@@ -57,7 +57,7 @@
                         android:layout_height="wrap_content"
                         android:text="사용자 이름"
                         android:textSize="12sp"
-                        android:textColor="#666666"/>
+                        android:textColor="#1150AB"/>
 
                     <TextView
                         android:id="@+id/tvUsername"
@@ -70,13 +70,14 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnEditProfile"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:text="회원 정보 수정"
                 android:textSize="14sp"
-                android:background="@drawable/button_primary"/>
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_border_1150ab" />
 
         </LinearLayout>
 
@@ -85,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/profile_background"
+            android:background="@drawable/background_section"
             android:padding="20dp"
             android:layout_marginBottom="24dp">
 
@@ -103,7 +104,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/username_background"
+                android:background="@drawable/background_item"
                 android:padding="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -111,7 +112,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_recent_history"
-                    android:tint="#666666"
+                    app:tint="#1150AB"
                     android:layout_marginEnd="16dp"/>
 
                 <LinearLayout
@@ -124,7 +125,7 @@
                         android:layout_height="wrap_content"
                         android:text="이번 달 총 지출"
                         android:textSize="14sp"
-                        android:textColor="#666666"/>
+                        android:textColor="#1150AB"/>
 
                     <TextView
                         android:id="@+id/tvMonthlyExpense"
@@ -143,7 +144,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/username_background"
+                android:background="@drawable/background_item"
                 android:padding="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -151,7 +152,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_sort_by_size"
-                    android:tint="#666666"
+                    app:tint="#1150AB"
                     android:layout_marginEnd="16dp"/>
 
                 <LinearLayout
@@ -164,7 +165,7 @@
                         android:layout_height="wrap_content"
                         android:text="가장 많이 쓴 카테고리"
                         android:textSize="14sp"
-                        android:textColor="#666666"/>
+                        android:textColor="#1150AB"/>
 
                     <TextView
                         android:id="@+id/tvTopCategory"
@@ -183,14 +184,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/username_background"
+                android:background="@drawable/background_item"
                 android:padding="16dp">
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_today"
-                    android:tint="#666666"
+                    app:tint="#1150AB"
                     android:layout_marginEnd="16dp"/>
 
                 <LinearLayout
@@ -203,7 +204,7 @@
                         android:layout_height="wrap_content"
                         android:text="이번 달 지출 건수"
                         android:textSize="14sp"
-                        android:textColor="#666666"/>
+                        android:textColor="#1150AB"/>
 
                     <TextView
                         android:id="@+id/tvTransactionCount"
@@ -225,14 +226,16 @@
             android:orientation="vertical"
             android:layout_marginTop="4dp">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:text="로그아웃"
                 android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@null"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/button_secondary"/>
+                android:background="@drawable/button_border_1150ab"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnDeleteAccount"
@@ -241,7 +244,8 @@
                 android:text="회원 탈퇴"
                 android:textSize="14sp"
                 android:textColor="#FFFFFF"
-                android:background="@drawable/button_danger"/>
+                android:backgroundTint="@null"
+                android:background="@drawable/button_border_red"/>
         </LinearLayout>
 
     </LinearLayout>

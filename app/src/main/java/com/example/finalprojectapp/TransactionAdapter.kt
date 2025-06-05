@@ -75,7 +75,7 @@ class TransactionAdapter(
         val textColor = if (transaction.type == "income") {
             Color.parseColor("#4CAF50") // 연한 초록색
         } else {
-            Color.parseColor("#F44336") // 연한 빨간색
+            Color.parseColor("#FF5252") // 연한 빨간색
         }
         holder.tvAmount.setTextColor(textColor)
 

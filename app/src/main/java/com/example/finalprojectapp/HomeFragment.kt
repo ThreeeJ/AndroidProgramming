@@ -201,7 +201,7 @@ class HomeFragment : Fragment() {
     private fun showTransactionDialog(transaction: Transaction? = null, type: String? = null) {
         try {
             val dialog = Dialog(requireContext())
-            dialog.setContentView(R.layout.dialog_add_transaction)
+            dialog.setContentView(R.layout.dialog_transaction_editor)
 
             // 다이얼로그 크기 설정
             val window = dialog.window
@@ -233,6 +233,14 @@ class HomeFragment : Fragment() {
                 transaction != null -> if (transactionType == "income") "수입 수정" else "지출 수정"
                 else -> if (transactionType == "income") "수입 추가" else "지출 추가"
             }
+            
+            // 제목 색상 설정
+            tvTitle.setTextColor(
+                if (transactionType == "income") 
+                    android.graphics.Color.parseColor("#4CAF50")  // 수입은 초록색
+                else 
+                    android.graphics.Color.parseColor("#FF5252")  // 지출은 빨간색
+            )
 
             try {
                 // 카테고리 스피너 설정
@@ -436,7 +444,7 @@ class HomeFragment : Fragment() {
     private fun showAllTransactionsDialog() {
         try {
             val dialog = Dialog(requireContext())
-            dialog.setContentView(R.layout.dialog_all_transactions)
+            dialog.setContentView(R.layout.dialog_transactions_list)
             
             // 다이얼로그 크기 설정
             val window = dialog.window
@@ -502,7 +510,7 @@ class HomeFragment : Fragment() {
     private fun showTransactionListDialog(title: String, date: String, type: String, isYearly: Boolean) {
         try {
             val dialog = Dialog(requireContext())
-            dialog.setContentView(R.layout.dialog_all_transactions)
+            dialog.setContentView(R.layout.dialog_transactions_list)
             
             // 다이얼로그 크기 설정
             val window = dialog.window
@@ -513,11 +521,27 @@ class HomeFragment : Fragment() {
 
             // 뷰 초기화
             val tvDialogTitle = dialog.findViewById<TextView>(R.id.tvDialogTitle)
+            val tvDialogDate = dialog.findViewById<TextView>(R.id.tvDialogDate)
             val rvAllTransactions = dialog.findViewById<RecyclerView>(R.id.rvAllTransactions)
             val btnClose = dialog.findViewById<Button>(R.id.btnClose)
 
-            // 제목 설정
+            // 제목 설정 및 색상 설정
             tvDialogTitle.text = title
+            tvDialogTitle.setTextColor(
+                if (type == "income") 
+                    android.graphics.Color.parseColor("#4CAF50")  // 수입은 초록색
+                else 
+                    android.graphics.Color.parseColor("#FF5252")  // 지출은 빨간색
+            )
+
+            // 날짜 표시 설정
+            val displayDate = if (isYearly) {
+                "${date}년"
+            } else {
+                val yearMonth = date.split("-")
+                "${yearMonth[0]}년 ${yearMonth[1]}월"
+            }
+            tvDialogDate.text = displayDate
 
             // RecyclerView 설정
             val adapter = TransactionAdapter(

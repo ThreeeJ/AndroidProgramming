@@ -7,4 +7,14 @@
     <path
         android:fillColor="#FF000000"
         android:pathData="M10,20v-6h4v6h5v-8h3L12,3 2,12h3v8z"/>
-</vector> 
+</vector>
+
+<!-- 하단 네비게이션 바, HOME 버튼 아이콘 -->
+<!-- 
+    1. res 우클릭
+    2. New -> Vector Asset -> Clip art
+    3. 이미지 검색 및 선택
+    4. 이름 작성(ex : home_24.xml)
+    5. 위치 선택 (drawable)
+    6. 확인 -> 그럼 pathData 경로가 있음, 그것을 그대로 사용!
+ -->
