@@ -20,20 +20,41 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * 지출 분석 화면을 담당하는 프래그먼트
+ * 일별/월별/연별 지출을 카테고리별로 분석하여 파이 차트로 표시합니다.
+ */
 class AnalysisFragment : Fragment() {
+    // 데이터베이스 헬퍼 클래스
     private lateinit var dbHelper: DatabaseHelper
+    // 파이 차트 뷰
     private lateinit var pieChart: PieChart
+    // 날짜 표시 텍스트뷰
     private lateinit var tvDate: TextView
+    // 기간 선택 드롭다운 버튼
     private lateinit var btnDropdown: ImageButton
+    // 로그인한 사용자 아이디
     private var username: String = ""
+    // 현재 선택된 날짜의 캘린더 객체
     private val calendar: Calendar = Calendar.getInstance()
+    // 현재 선택된 보기 모드 (일별/월별/연별)
     private var currentViewMode: ViewMode = ViewMode.DAILY
+    // MainActivity에서 전달받은 선택된 날짜
     private var selectedDate: String? = null
 
+    /**
+     * 분석 화면의 보기 모드를 정의하는 열거형
+     */
     enum class ViewMode {
-        DAILY, MONTHLY, YEARLY
+        DAILY,    // 일별 보기
+        MONTHLY,  // 월별 보기
+        YEARLY    // 연별 보기
     }
 
+    /**
+     * 프래그먼트가 생성될 때 호출되는 메서드
+     * 사용자 정보와 선택된 날짜를 초기화합니다.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         username = arguments?.getString("username") ?: ""
@@ -50,6 +71,9 @@ class AnalysisFragment : Fragment() {
         }
     }
 
+    /**
+     * 프래그먼트의 뷰가 생성될 때 호출되는 메서드
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,6 +82,10 @@ class AnalysisFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_analysis, container, false)
     }
 
+    /**
+     * 프래그먼트의 뷰가 생성된 후 호출되는 메서드
+     * 초기화 작업을 수행합니다.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dbHelper = DatabaseHelper(requireContext())
@@ -68,6 +96,11 @@ class AnalysisFragment : Fragment() {
         loadExpenseData()
     }
 
+    /**
+     * UI 요소들을 초기화하는 메서드
+     * 파이 차트, 날짜 표시, 드롭다운 버튼을 초기화하고
+     * 드롭다운 버튼의 클릭 리스너를 설정합니다.
+     */
     private fun initializeViews(view: View) {
         pieChart = view.findViewById(R.id.pieChart)
         tvDate = view.findViewById(R.id.tvDate)
@@ -78,6 +111,10 @@ class AnalysisFragment : Fragment() {
         }
     }
 
+    /**
+     * 기간 선택 팝업을 표시하는 메서드
+     * 일별/월별/연별 보기를 선택할 수 있는 팝업 메뉴를 표시합니다.
+     */
     private fun showDateFilterPopup(anchorView: View) {
         val inflater = LayoutInflater.from(requireContext())
         val popupView = inflater.inflate(R.layout.popup_date_filter, null)
@@ -115,6 +152,12 @@ class AnalysisFragment : Fragment() {
         popupWindow.showAsDropDown(anchorView)
     }
 
+    /**
+     * 파이 차트의 기본 설정을 하는 메서드
+     * - 차트의 모양과 스타일 설정
+     * - 범례 설정
+     * - 크기와 여백 설정
+     */
     private fun setupPieChart() {
         pieChart.apply {
             description.isEnabled = false
@@ -153,6 +196,12 @@ class AnalysisFragment : Fragment() {
         }
     }
 
+    /**
+     * 현재 선택된 보기 모드에 따라 날짜를 표시하는 메서드
+     * - 일별: yyyy년 M월 d일
+     * - 월별: yyyy년 M월
+     * - 연별: yyyy년
+     */
     private fun updateDateDisplay() {
         val dateFormat = when (currentViewMode) {
             ViewMode.DAILY -> SimpleDateFormat("yyyy년 M월 d일", Locale.KOREA)
@@ -162,6 +211,12 @@ class AnalysisFragment : Fragment() {
         tvDate.text = dateFormat.format(calendar.time)
     }
 
+    /**
+     * 선택된 기간의 지출 데이터를 로드하여 파이 차트에 표시하는 메서드
+     * - 각 카테고리별 지출 금액을 계산
+     * - 카테고리별 비율을 계산하여 파이 차트에 표시
+     * - 카테고리별로 서로 다른 색상 적용
+     */
     private fun loadExpenseData() {
         val expenseData = when (currentViewMode) {
             ViewMode.DAILY -> {
@@ -200,42 +255,38 @@ class AnalysisFragment : Fragment() {
                 categoryCount == 2 -> 53f
                 categoryCount == 3 -> 36f
                 categoryCount == 4 -> 19f
-                else -> 2f - (17f * (categoryCount - 5)) // 5개부터 0f, 이후 15씩 감소
+                else -> 2f - (17f * (categoryCount - 5))
             }
             maxSizePercent = if (categoryCount >= 5) 0.7f else 1f
         }
 
         val entries = ArrayList<PieEntry>()
         val colors = ArrayList<Int>()
-
-        // 기본 색상 배열 수정
+        
+        // 새로운 색상 배열 정의
         val colorArray = intArrayOf(
-            Color.rgb(69, 105, 169),  // 진한 파란색
-            Color.rgb(170, 186, 147),  // 부드러운 녹색
-            Color.rgb(239, 139, 98),   // 연한 주황색
-            Color.rgb(155, 89, 182),   // 보라색
-            Color.rgb(65, 179, 164),   // 청록색
-            Color.rgb(225, 95, 109),   // 연한 빨간색
-            Color.rgb(251, 177, 98),   // 밝은 주황색
-            Color.rgb(108, 156, 178)   // 회청색
+            resources.getColor(R.color.chart_color_1, null),  // 인디고
+            resources.getColor(R.color.chart_color_2, null),  // 틸
+            resources.getColor(R.color.chart_color_3, null),  // 오렌지
+            resources.getColor(R.color.chart_color_4, null),  // 레드
+            resources.getColor(R.color.chart_color_5, null),  // 그린
+            resources.getColor(R.color.chart_color_6, null),  // 브라운
+            resources.getColor(R.color.chart_color_7, null),  // 딥 퍼플
+            resources.getColor(R.color.chart_color_8, null)   // 라이트 블루
         )
 
         var totalAmount = 0f
-        expenseData.values.forEach { amount ->
-            totalAmount += amount
-        }
+        expenseData.values.forEach { amount -> totalAmount += amount }
 
-        var index = 0
-        expenseData.forEach { (category, amount) ->
+        expenseData.entries.forEachIndexed { index, (category, amount) ->
             entries.add(PieEntry((amount / totalAmount) * 100f, category))
             colors.add(colorArray[index % colorArray.size])
-            index++
         }
 
         val dataSet = PieDataSet(entries, "").apply {
             this.colors = colors
             setDrawValues(true)
-            valueTextSize = 22f
+            valueTextSize = 25f
             valueTextColor = Color.BLACK
             valueFormatter = PercentFormatter().apply {
                 mFormat = java.text.DecimalFormat("##.0")
@@ -245,19 +296,29 @@ class AnalysisFragment : Fragment() {
             sliceSpace = 3f
         }
 
-        pieChart.data = PieData(dataSet).apply {
-            setValueTextSize(22f)
-            setDrawValues(true)
-            setValueFormatter(PercentFormatter().apply {
-                mFormat = java.text.DecimalFormat("##.0")
-            })
+        pieChart.apply {
+            data = PieData(dataSet).apply {
+                setValueTextSize(25f)
+                setDrawValues(true)
+                setValueFormatter(PercentFormatter().apply {
+                    mFormat = java.text.DecimalFormat("##.0")
+                })
+            }
+            setEntryLabelColor(Color.TRANSPARENT)
+            setEntryLabelTextSize(0f)
+            setHoleColor(resources.getColor(R.color.chart_background, null))
+            setCenterTextColor(Color.BLACK)
+            legend.textColor = resources.getColor(R.color.chart_text, null)
+            invalidate()
         }
-        pieChart.setEntryLabelColor(Color.TRANSPARENT)
-        pieChart.setEntryLabelTextSize(0f)
-        pieChart.invalidate()
     }
 
     companion object {
+        /**
+         * AnalysisFragment의 새로운 인스턴스를 생성하는 팩토리 메서드
+         * @param username 사용자 아이디
+         * @param selectedDate 선택된 날짜 (nullable)
+         */
         fun newInstance(username: String, selectedDate: String? = null): AnalysisFragment {
             return AnalysisFragment().apply {
                 arguments = Bundle().apply {

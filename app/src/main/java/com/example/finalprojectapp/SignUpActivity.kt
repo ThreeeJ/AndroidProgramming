@@ -8,81 +8,79 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.finalprojectapp.databinding.ActivityRegisterBinding
+import com.example.finalprojectapp.databinding.ActivitySignupBinding
 
-class RegisterActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityRegisterBinding
+/**
+ * 회원가입 화면을 담당하는 액티비티
+ * 사용자로부터 이름, 아이디, 비밀번호를 입력받아 새로운 계정을 생성합니다.
+ */
+class SignUpActivity : AppCompatActivity() {
+    // 뷰 바인딩 객체
+    private lateinit var binding: ActivitySignupBinding
+    // 데이터베이스 헬퍼 클래스
     private lateinit var dbHelper: DatabaseHelper
+    // 아이디 중복 확인 여부를 저장하는 변수
     private var isIdChecked = false
 
+    /**
+     * 액티비티가 생성될 때 호출되는 메서드
+     * 초기화 작업을 수행합니다.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         dbHelper = DatabaseHelper(this)
 
-        setupButtons()
+        setupIdCheck()
         setupPasswordConfirmation()
+        setupRegisterButton()
     }
 
-    private fun setupButtons() {
-        // 아이디 중복 확인 버튼
-        binding.buttonCheckId.setOnClickListener {
-            val username = binding.editTextRegisterId.text.toString()
-            when {
-                username.isEmpty() -> {
-                    Toast.makeText(this, "아이디를 입력해주세요", Toast.LENGTH_SHORT).show()
-                }
-                dbHelper.isUserExists(username) -> {
-                    binding.textViewIdCheck.apply {
-                        text = "X"
-                        setTextColor(ContextCompat.getColor(this@RegisterActivity, android.R.color.holo_red_dark))
-                        visibility = View.VISIBLE
-                    }
-                    binding.buttonCheckId.backgroundTintList = ContextCompat.getColorStateList(
-                        this,
-                        android.R.color.holo_red_light
-                    )
-                    isIdChecked = false
-                    Toast.makeText(this, "이미 존재하는 아이디입니다", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    binding.textViewIdCheck.apply {
-                        text = "O"
-                        setTextColor(ContextCompat.getColor(this@RegisterActivity, android.R.color.holo_green_dark))
-                        visibility = View.VISIBLE
-                    }
-                    binding.buttonCheckId.backgroundTintList = ContextCompat.getColorStateList(
-                        this,
-                        android.R.color.holo_green_light
-                    )
-                    isIdChecked = true
-                    Toast.makeText(this, "사용 가능한 아이디입니다", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        // 아이디 입력 필드 변경 감지
-        binding.editTextRegisterId.addTextChangedListener(object : TextWatcher {
+    /**
+     * 아이디 입력 필드의 변경을 감지하고 중복 확인을 수행하는 메서드
+     */
+    private fun setupIdCheck() {
+        binding.editTextSignupId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                binding.buttonCheckId.backgroundTintList = ContextCompat.getColorStateList(
-                    this@RegisterActivity,
-                    android.R.color.darker_gray
-                )
-                binding.textViewIdCheck.visibility = View.GONE
-                isIdChecked = false
+                val username = s.toString().trim()
+                if (username.isEmpty()) {
+                    binding.editTextSignupId.setBackgroundResource(R.drawable.edit_text_border)
+                    binding.textViewIdCheck.visibility = View.INVISIBLE
+                    isIdChecked = false
+                    return
+                }
+
+                if (dbHelper.isUserExists(username)) {
+                    // 중복된 아이디
+                    binding.editTextSignupId.setBackgroundResource(R.drawable.edit_text_background_error)
+                    binding.textViewIdCheck.apply {
+                        text = "중복된 아이디입니다"
+                        setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                        visibility = View.VISIBLE
+                    }
+                    isIdChecked = false
+                } else {
+                    // 사용 가능한 아이디
+                    binding.editTextSignupId.setBackgroundResource(R.drawable.edit_text_background_success)
+                    binding.textViewIdCheck.apply {
+                        text = "사용 가능한 아이디입니다"
+                        setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark))
+                        visibility = View.VISIBLE
+                    }
+                    isIdChecked = true
+                }
             }
         })
-
-        // 회원가입 버튼
-        binding.buttonRegisterSubmit.setOnClickListener {
-            registerUser()
-        }
     }
 
+    /**
+     * 비밀번호 확인 기능을 설정하는 메서드
+     * 비밀번호와 비밀번호 확인 필드의 텍스트 변경을 감지합니다.
+     */
     private fun setupPasswordConfirmation() {
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -92,25 +90,29 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        binding.editTextRegisterPassword.addTextChangedListener(textWatcher)
+        binding.editTextSignupPassword.addTextChangedListener(textWatcher)
         binding.editTextConfirmPassword.addTextChangedListener(textWatcher)
     }
 
+    /**
+     * 비밀번호 일치 여부를 확인하는 메서드
+     * 비밀번호가 일치하면 초록색, 불일치하면 빨간색으로 표시합니다.
+     */
     private fun checkPasswordMatch() {
-        val password = binding.editTextRegisterPassword.text.toString()
+        val password = binding.editTextSignupPassword.text.toString()
         val confirmPassword = binding.editTextConfirmPassword.text.toString()
 
         // 비밀번호 확인 필드가 비어있고, 비밀번호 필드도 비어있으면 기본 상태 유지
         if (confirmPassword.isEmpty() && password.isEmpty()) {
-            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_background_normal)
-            binding.tvPasswordMatch.visibility = View.GONE
+            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_border)
+            binding.tvPasswordMatch.visibility = View.INVISIBLE
             return
         }
 
         // 비밀번호 확인 필드가 비어있으면 검사하지 않음
         if (confirmPassword.isEmpty()) {
-            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_background_normal)
-            binding.tvPasswordMatch.visibility = View.GONE
+            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_border)
+            binding.tvPasswordMatch.visibility = View.INVISIBLE
             return
         }
 
@@ -134,10 +136,24 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 회원가입 버튼 클릭 리스너 설정
+     */
+    private fun setupRegisterButton() {
+        binding.buttonSignupSubmit.setOnClickListener {
+            registerUser()
+        }
+    }
+
+    /**
+     * 회원가입을 처리하는 메서드
+     * 입력된 정보의 유효성을 검사하고 데이터베이스에 저장합니다.
+     * 성공 시 로그인 화면으로 이동합니다.
+     */
     private fun registerUser() {
         val name = binding.editTextName.text.toString().trim()
-        val username = binding.editTextRegisterId.text.toString().trim()
-        val password = binding.editTextRegisterPassword.text.toString()
+        val username = binding.editTextSignupId.text.toString().trim()
+        val password = binding.editTextSignupPassword.text.toString()
         val confirmPassword = binding.editTextConfirmPassword.text.toString()
 
         when {

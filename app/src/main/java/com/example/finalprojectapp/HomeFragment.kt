@@ -23,20 +23,36 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+/**
+ * 가계부 앱의 메인 화면을 담당하는 프래그먼트
+ * 일별/월별/연별 수입/지출 내역을 표시하고
+ * 거래 내역의 추가/수정/삭제를 관리합니다.
+ */
 class HomeFragment : Fragment() {
+    // 데이터베이스 헬퍼 클래스
     private lateinit var dbHelper: DatabaseHelper
+    // 거래 내역 목록을 표시하는 어댑터
     private lateinit var transactionAdapter: TransactionAdapter
-    private lateinit var tvDate: TextView
-    private lateinit var tvYearlyIncome: TextView
-    private lateinit var tvYearlyExpense: TextView
-    private lateinit var tvMonthlyIncome: TextView
-    private lateinit var tvMonthlyExpense: TextView
-    private lateinit var tvDailyIncome: TextView
-    private lateinit var tvDailyExpense: TextView
-    private lateinit var rvTransactions: RecyclerView
+    
+    // UI 요소들
+    private lateinit var tvDate: TextView  // 선택된 날짜 표시
+    private lateinit var tvYearlyIncome: TextView  // 연간 수입 합계
+    private lateinit var tvYearlyExpense: TextView  // 연간 지출 합계
+    private lateinit var tvMonthlyIncome: TextView  // 월간 수입 합계
+    private lateinit var tvMonthlyExpense: TextView  // 월간 지출 합계
+    private lateinit var tvDailyIncome: TextView  // 일별 수입 합계
+    private lateinit var tvDailyExpense: TextView  // 일별 지출 합계
+    private lateinit var rvTransactions: RecyclerView  // 거래 내역 목록
+    
+    // 현재 선택된 날짜
     private var selectedDate: Calendar = Calendar.getInstance()
+    // 로그인한 사용자 아이디
     private var username: String = ""
 
+    /**
+     * 프래그먼트가 생성될 때 호출되는 메서드
+     * 사용자 정보와 선택된 날짜를 초기화합니다.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         username = arguments?.getString("username") ?: ""
@@ -44,8 +60,21 @@ class HomeFragment : Fragment() {
             Toast.makeText(context, "사용자 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
             activity?.finish()
         }
+
+        // MainActivity에서 전달받은 선택된 날짜가 있으면 설정
+        arguments?.getString("selected_date")?.let { dateStr ->
+            try {
+                val date = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).parse(dateStr)
+                selectedDate.time = date
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
+    /**
+     * 프래그먼트의 뷰가 생성될 때 호출되는 메서드
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,6 +83,10 @@ class HomeFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
+    /**
+     * 프래그먼트의 뷰가 생성된 후 호출되는 메서드
+     * 초기화 작업을 수행합니다.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
@@ -74,6 +107,10 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * UI 요소들을 초기화하는 메서드
+     * 모든 TextView와 RecyclerView의 참조를 가져옵니다.
+     */
     private fun initializeViews(view: View) {
         tvDate = view.findViewById(R.id.tvDate)
         tvYearlyIncome = view.findViewById(R.id.tvYearlyIncome)
@@ -85,6 +122,10 @@ class HomeFragment : Fragment() {
         rvTransactions = view.findViewById(R.id.rvTransactions)
     }
 
+    /**
+     * RecyclerView 초기화 및 설정
+     * 거래 내역을 표시하는 어댑터를 설정합니다.
+     */
     private fun setupRecyclerView() {
         val adapter = TransactionAdapter(
             emptyList(),
@@ -100,6 +141,14 @@ class HomeFragment : Fragment() {
         transactionAdapter = adapter
     }
 
+    /**
+     * 모든 클릭 리스너를 설정하는 메서드
+     * - 달력 버튼: 날짜 선택
+     * - 수입/지출 추가 버튼: 거래 내역 추가
+     * - 카테고리 관리 버튼: 카테고리 관리 화면으로 이동
+     * - 더보기 버튼: 전체 거래 내역 표시
+     * - 연간/월간 수입/지출 텍스트: 상세 내역 표시
+     */
     private fun setupClickListeners() {
         view?.findViewById<View>(R.id.btnCalendar)?.setOnClickListener {
             showDatePicker()
@@ -144,6 +193,11 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * 거래 내역 추가/수정 다이얼로그를 표시하는 메서드
+     * @param transaction 수정할 거래 내역 (null인 경우 새로운 거래 추가)
+     * @param type 거래 유형 ("income" 또는 "expense")
+     */
     private fun showTransactionDialog(transaction: Transaction? = null, type: String? = null) {
         try {
             val dialog = Dialog(requireContext())
@@ -288,6 +342,10 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * 날짜 선택 다이얼로그를 표시하는 메서드
+     * 날짜가 선택되면 화면을 업데이트하고 MainActivity에 알립니다.
+     */
     private fun showDatePicker() {
         DatePickerDialog(
             requireContext(),
@@ -295,6 +353,8 @@ class HomeFragment : Fragment() {
                 selectedDate.set(year, month, dayOfMonth)
                 updateDateDisplay()
                 loadTransactions()
+                // MainActivity에 선택된 날짜 전달
+                (activity as? MainActivity)?.updateSelectedDate(getSelectedDate())
             },
             selectedDate.get(Calendar.YEAR),
             selectedDate.get(Calendar.MONTH),
@@ -302,11 +362,17 @@ class HomeFragment : Fragment() {
         ).show()
     }
 
+    /**
+     * 선택된 날짜를 화면에 표시하는 메서드
+     */
     private fun updateDateDisplay() {
         val dateFormat = SimpleDateFormat("yyyy년 M월 d일 (E)", Locale.KOREA)
         tvDate.text = dateFormat.format(selectedDate.time)
     }
 
+    /**
+     * 선택된 날짜의 거래 내역을 데이터베이스에서 불러와 표시하는 메서드
+     */
     private fun loadTransactions() {
         try {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
@@ -329,6 +395,9 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * 일별/월별/연별 수입/지출 합계를 계산하여 화면에 표시하는 메서드
+     */
     private fun updateSummary() {
         try {
             val numberFormat = NumberFormat.getNumberInstance(Locale.KOREA)
@@ -360,6 +429,10 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * 전체 거래 내역을 보여주는 다이얼로그를 표시하는 메서드
+     * 선택된 날짜의 모든 거래 내역을 표시합니다.
+     */
     private fun showAllTransactionsDialog() {
         try {
             val dialog = Dialog(requireContext())
@@ -419,6 +492,13 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * 연간/월간 거래 내역을 보여주는 다이얼로그를 표시하는 메서드
+     * @param title 다이얼로그 제목
+     * @param date 조회할 날짜 (yyyy 또는 yyyy-MM 형식)
+     * @param type 거래 유형 ("income" 또는 "expense")
+     * @param isYearly true인 경우 연간 내역, false인 경우 월간 내역
+     */
     private fun showTransactionListDialog(title: String, date: String, type: String, isYearly: Boolean) {
         try {
             val dialog = Dialog(requireContext())
@@ -474,12 +554,18 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * 현재 선택된 날짜를 "yyyy-MM-dd" 형식의 문자열로 반환하는 메서드
+     */
     fun getSelectedDate(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
         return dateFormat.format(selectedDate.time)
     }
 
     companion object {
+        /**
+         * HomeFragment의 새로운 인스턴스를 생성하는 팩토리 메서드
+         */
         fun newInstance() = HomeFragment()
     }
 } 

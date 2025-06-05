@@ -11,4 +11,19 @@
     <!-- 앱에서 사용할 커스텀 색상 -->
     <color name="income_color">#4CAF50</color>
     <color name="expense_color">#F44336</color>
+
+    <!-- 차트 색상 팔레트 -->
+    <color name="chart_color_1">#5C6BC0</color> <!-- 인디고 -->
+    <color name="chart_color_2">#26A69A</color> <!-- 틸 -->
+    <color name="chart_color_3">#FFA726</color> <!-- 오렌지 -->
+    <color name="chart_color_4">#EF5350</color> <!-- 레드 -->
+    <color name="chart_color_5">#66BB6A</color> <!-- 그린 -->
+    <color name="chart_color_6">#8D6E63</color> <!-- 브라운 -->
+    <color name="chart_color_7">#7E57C2</color> <!-- 딥 퍼플 -->
+    <color name="chart_color_8">#42A5F5</color> <!-- 라이트 블루 -->
+    
+    <!-- 차트 하이라이트 색상 -->
+    <color name="chart_highlight">#FF6200EE</color>
+    <color name="chart_text">#424242</color>
+    <color name="chart_background">#FFFFFF</color>
 </resources>

@@ -12,12 +12,24 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.finalprojectapp.databinding.ActivityLoginBinding
 
+/**
+ * 로그인 화면을 담당하는 액티비티
+ * 사용자 인증을 처리하고 메인 화면으로 이동합니다.
+ */
 class LoginActivity : AppCompatActivity() {
+    // 뷰 바인딩 객체
     private lateinit var binding: ActivityLoginBinding
+    // 데이터베이스 헬퍼 클래스
     private lateinit var dbHelper: DatabaseHelper
+    // 아이디 입력 필드
     private lateinit var etUsername: EditText
+    // 비밀번호 입력 필드
     private lateinit var etPassword: EditText
 
+    /**
+     * 액티비티가 생성될 때 호출되는 메서드
+     * 초기화 작업을 수행합니다.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -29,6 +41,10 @@ class LoginActivity : AppCompatActivity() {
         setupClickListeners()
     }
 
+    /**
+     * UI 요소들을 초기화하는 메서드
+     * 입력 필드와 삭제 버튼을 설정합니다.
+     */
     private fun initializeViews() {
         etUsername = binding.editTextId
         etPassword = binding.editTextPassword
@@ -42,6 +58,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 입력 필드의 텍스트 변경을 감지하는 리스너를 설정하는 메서드
+     * 텍스트가 있을 때만 삭제 버튼을 표시합니다.
+     */
     private fun setupTextWatchers() {
         binding.editTextId.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -60,6 +80,11 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * 버튼들의 클릭 리스너를 설정하는 메서드
+     * - 로그인 버튼: 사용자 인증 후 메인 화면으로 이동
+     * - 회원가입 버튼: 회원가입 화면으로 이동
+     */
     private fun setupClickListeners() {
         // 로그인 버튼
         binding.buttonLogin.setOnClickListener {
@@ -83,8 +108,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // 회원가입 버튼
-        binding.buttonRegister.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+        binding.buttonSignup.setOnClickListener {
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
     }
 } 
