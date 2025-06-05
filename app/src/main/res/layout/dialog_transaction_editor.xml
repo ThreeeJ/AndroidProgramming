@@ -34,30 +34,34 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_weight="1"
             android:text="취소"
-            android:layout_marginEnd="8dp"/>
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_border_1150ab"
+            android:layout_marginEnd="8dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSave"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_weight="1"
-            android:text="저장"/>
+            android:text="저장"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_border_1150ab" />
 
     </LinearLayout>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnDelete"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:text="삭제"
-        android:backgroundTint="#FF5722"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"/>
+        android:textColor="#FFFFFF"
+        android:background="@drawable/button_border_red"
+        android:layout_marginTop="8dp" />
 
 </LinearLayout> 

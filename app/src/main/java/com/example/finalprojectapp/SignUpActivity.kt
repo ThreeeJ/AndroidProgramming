@@ -48,7 +48,7 @@ class SignUpActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val username = s.toString().trim()
                 if (username.isEmpty()) {
-                    binding.editTextSignupId.setBackgroundResource(R.drawable.edit_text_border)
+                    binding.editTextSignupId.setBackgroundResource(R.drawable.edit_text_border_1150ab)
                     binding.textViewIdCheck.visibility = View.INVISIBLE
                     isIdChecked = false
                     return
@@ -104,14 +104,14 @@ class SignUpActivity : AppCompatActivity() {
 
         // 비밀번호 확인 필드가 비어있고, 비밀번호 필드도 비어있으면 기본 상태 유지
         if (confirmPassword.isEmpty() && password.isEmpty()) {
-            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_border)
+            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_border_1150ab)
             binding.tvPasswordMatch.visibility = View.INVISIBLE
             return
         }
 
         // 비밀번호 확인 필드가 비어있으면 검사하지 않음
         if (confirmPassword.isEmpty()) {
-            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_border)
+            binding.editTextConfirmPassword.setBackgroundResource(R.drawable.edit_text_border_1150ab)
             binding.tvPasswordMatch.visibility = View.INVISIBLE
             return
         }

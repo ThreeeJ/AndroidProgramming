@@ -10,7 +10,7 @@
     
     <!-- 앱에서 사용할 커스텀 색상 -->
     <color name="income_color">#4CAF50</color>
-    <color name="expense_color">#F44336</color>
+    <color name="expense_color">#FF5252</color>
 
     <!-- 차트 색상 팔레트 -->
     <color name="chart_color_1">#5C6BC0</color> <!-- 인디고 -->

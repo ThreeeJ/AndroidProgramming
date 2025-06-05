@@ -35,8 +35,10 @@ class CategoryManagementActivity : AppCompatActivity() {
                 throw Exception("필수 뷰를 찾을 수 없습니다.")
             }
 
+            // ViewPager2 기본 설정
             viewPager.adapter = CategoryPagerAdapter(this)
-
+            
+            // TabLayout과 ViewPager2 연결
             TabLayoutMediator(tabLayout, viewPager) { tab, position ->
                 tab.text = if (position == 0) "수입" else "지출"
             }.attach()
