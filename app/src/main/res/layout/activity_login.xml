@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 배경 이미지 -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/login" />
+        android:src="@drawable/donsam_white" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,20 +17,24 @@
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.58">
 
+        <!-- 아이디 입력 -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="15dp">
 
             <EditText
                 android:id="@+id/editTextId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#CCFFFFFF"
+                android:background="@drawable/edit_text_border"
                 android:hint="아이디"
-                android:padding="15dp" />
+                android:padding="15dp"
+                android:textColor="#1150AB"
+                android:textColorHint="#1150AB" />
 
             <ImageButton
                 android:id="@+id/buttonClearId"
@@ -42,20 +47,22 @@
                 android:src="@android:drawable/ic_notification_clear_all"
                 android:visibility="gone" />
         </FrameLayout>
-
+        <!-- 비밀번호 입력 -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="40dp">
 
             <EditText
                 android:id="@+id/editTextPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#CCFFFFFF"
+                android:background="@drawable/edit_text_border"
                 android:hint="비밀번호"
                 android:inputType="textPassword"
-                android:padding="15dp" />
+                android:padding="15dp"
+                android:textColor="#1150AB"
+                android:textColorHint="#1150AB" />
 
             <ImageButton
                 android:id="@+id/buttonClearPassword"
@@ -69,18 +76,22 @@
                 android:visibility="gone" />
         </FrameLayout>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="로그인" />
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/button_border"
+            android:text="로그인"
+            android:textColor="#FFFFFF" />
 
-        <Button
-            android:id="@+id/buttonRegister"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonSignup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="회원가입" />
+            android:background="@drawable/button_border"
+            android:text="회원가입"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 
