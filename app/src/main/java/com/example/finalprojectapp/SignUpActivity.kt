@@ -18,7 +18,7 @@ class SignUpActivity : AppCompatActivity() {
     // 뷰 바인딩 객체
     private lateinit var binding: ActivitySignupBinding
     // 데이터베이스 헬퍼 클래스
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DB
     // 아이디 중복 확인 여부를 저장하는 변수
     private var isIdChecked = false
 
@@ -31,7 +31,7 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        dbHelper = DatabaseHelper(this)
+        dbHelper = DB(this)
 
         setupIdCheck()
         setupPasswordConfirmation()

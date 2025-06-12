@@ -5,14 +5,13 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import java.util.Date
 
 /**
  * SQLite 데이터베이스를 관리하는 헬퍼 클래스
  * 사용자, 카테고리, 거래 내역 테이블을 관리하며
  * 데이터의 추가/수정/삭제/조회 기능을 제공합니다.
  */
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DB(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         // 데이터베이스 기본 정보

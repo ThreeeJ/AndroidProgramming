@@ -1,8 +1,8 @@
 package com.example.finalprojectapp
 
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +26,7 @@ import java.util.Locale
  */
 class AnalysisFragment : Fragment() {
     // 데이터베이스 헬퍼 클래스
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DB
     // 파이 차트 뷰
     private lateinit var pieChart: PieChart
     // 날짜 표시 텍스트뷰
@@ -88,7 +88,7 @@ class AnalysisFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = DatabaseHelper(requireContext())
+        dbHelper = DB(requireContext())
 
         initializeViews(view)
         setupPieChart()
@@ -126,22 +126,41 @@ class AnalysisFragment : Fragment() {
             true
         )
 
+        // 현재 선택된 모드의 텍스트 색상과 스타일 변경
+        val tvDaily = popupView.findViewById<TextView>(R.id.tvDaily)
+        val tvMonthly = popupView.findViewById<TextView>(R.id.tvMonthly)
+        val tvYearly = popupView.findViewById<TextView>(R.id.tvYearly)
+
+        // 초기 상태 설정
+        tvDaily.apply {
+            setTextColor(if (currentViewMode == ViewMode.DAILY) Color.parseColor("#1150AB") else Color.parseColor("#757575"))
+            typeface = if (currentViewMode == ViewMode.DAILY) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        }
+        tvMonthly.apply {
+            setTextColor(if (currentViewMode == ViewMode.MONTHLY) Color.parseColor("#1150AB") else Color.parseColor("#757575"))
+            typeface = if (currentViewMode == ViewMode.MONTHLY) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        }
+        tvYearly.apply {
+            setTextColor(if (currentViewMode == ViewMode.YEARLY) Color.parseColor("#1150AB") else Color.parseColor("#757575"))
+            typeface = if (currentViewMode == ViewMode.YEARLY) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        }
+
         // 팝업 메뉴 아이템 클릭 리스너 설정
-        popupView.findViewById<TextView>(R.id.tvDaily).setOnClickListener {
+        tvDaily.setOnClickListener {
             currentViewMode = ViewMode.DAILY
             updateDateDisplay()
             loadExpenseData()
             popupWindow.dismiss()
         }
 
-        popupView.findViewById<TextView>(R.id.tvMonthly).setOnClickListener {
+        tvMonthly.setOnClickListener {
             currentViewMode = ViewMode.MONTHLY
             updateDateDisplay()
             loadExpenseData()
             popupWindow.dismiss()
         }
 
-        popupView.findViewById<TextView>(R.id.tvYearly).setOnClickListener {
+        tvYearly.setOnClickListener {
             currentViewMode = ViewMode.YEARLY
             updateDateDisplay()
             loadExpenseData()
@@ -169,6 +188,9 @@ class AnalysisFragment : Fragment() {
             centerText = "지출 분석"
             setCenterTextSize(24f)
             setUsePercentValues(true)
+            
+            // NoDataText 색상 설정
+            setNoDataTextColor(Color.parseColor("#1150AB"))
             
             // 범례 설정
             legend.apply {

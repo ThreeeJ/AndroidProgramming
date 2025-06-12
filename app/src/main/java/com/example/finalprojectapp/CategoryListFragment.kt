@@ -20,7 +20,7 @@ import android.widget.ImageButton
  */
 class CategoryListFragment : Fragment() {
     // 데이터베이스 헬퍼 클래스
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DB
     // 카테고리 유형 ("income" 또는 "expense")
     private lateinit var type: String
     // 카테고리 목록을 표시하는 RecyclerView
@@ -51,7 +51,7 @@ class CategoryListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         type = arguments?.getString("type") ?: "income"
-        dbHelper = DatabaseHelper(requireContext())
+        dbHelper = DB(requireContext())
     }
 
     /**
@@ -124,19 +124,27 @@ class CategoryListFragment : Fragment() {
     private fun showAddDialog() {
         try {
             val dialog = AlertDialog.Builder(requireContext())
-            val dialogView = layoutInflater.inflate(R.layout.dialog_edit_text, null)
-            val editText = dialogView.findViewById<EditText>(R.id.editText)
-
-            dialog.setView(dialogView)
-                .setTitle("카테고리 추가")
-                .setPositiveButton("추가", null)
-                .setNegativeButton("취소", null)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_add_category, null)
+            val editText = dialogView.findViewById<EditText>(R.id.etCategoryName)
+            val btnAdd = dialogView.findViewById<Button>(R.id.btnAdd)
+            val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
             val alertDialog = dialog.create()
+            alertDialog.setView(dialogView)
+            
+            // 다이얼로그 크기 설정
+            alertDialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            
             alertDialog.show()
 
-            // Positive 버튼에 대한 클릭 리스너를 따로 설정
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            btnCancel.setOnClickListener {
+                alertDialog.dismiss()
+            }
+
+            btnAdd.setOnClickListener {
                 val categoryName = editText.text.toString().trim()
                 android.util.Log.d(TAG, "카테고리 추가 시도: 이름=$categoryName, 타입=$type")
 
@@ -183,26 +191,49 @@ class CategoryListFragment : Fragment() {
      */
     private fun showEditDialog(category: Category) {
         val dialog = AlertDialog.Builder(requireContext())
-        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_text, null)
-        val editText = dialogView.findViewById<EditText>(R.id.editText)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_category, null)
+        val editText = dialogView.findViewById<EditText>(R.id.etCategoryName)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnSave)
+        
         editText.setText(category.name)
 
-        dialog.setView(dialogView)
-            .setTitle("카테고리 수정")
-            .setPositiveButton("수정") { _, _ ->
-                val newName = editText.text.toString()
-                if (newName.isNotEmpty()) {
-                    try {
-                        dbHelper.updateCategory(category.id, newName)
-                        loadCategories()
-                        Toast.makeText(context, "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
-                    } catch (e: Exception) {
-                        Toast.makeText(context, "카테고리 수정 중 오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+        val alertDialog = dialog.create()
+        alertDialog.setView(dialogView)
+        
+        // 다이얼로그 크기 설정
+        alertDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        
+        alertDialog.show()
+
+        btnCancel.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        btnSave.setOnClickListener {
+            val newName = editText.text.toString().trim()
+            if (newName.isEmpty()) {
+                editText.error = "카테고리 이름을 입력해주세요"
+                return@setOnClickListener
             }
-            .setNegativeButton("취소", null)
-            .show()
+
+            try {
+                if (dbHelper.isCategoryExists(newName, type) && newName != category.name) {
+                    editText.error = "이미 존재하는 카테고리입니다"
+                    return@setOnClickListener
+                }
+
+                dbHelper.updateCategory(category.id, newName)
+                loadCategories()
+                Toast.makeText(context, "카테고리가 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                alertDialog.dismiss()
+            } catch (e: Exception) {
+                Toast.makeText(context, "카테고리 수정 중 오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     /**
@@ -210,20 +241,36 @@ class CategoryListFragment : Fragment() {
      * @param category 삭제할 카테고리
      */
     private fun showDeleteDialog(category: Category) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("카테고리 삭제")
-            .setMessage("이 카테고리를 삭제하시겠습니까?")
-            .setPositiveButton("삭제") { _, _ ->
-                try {
-                    dbHelper.deleteCategory(category.id)
-                    loadCategories()
-                    Toast.makeText(context, "카테고리가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    Toast.makeText(context, "카테고리 삭제 중 오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+        val dialog = AlertDialog.Builder(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_category, null)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+        val btnDelete = dialogView.findViewById<Button>(R.id.btnDelete)
+
+        val alertDialog = dialog.create()
+        alertDialog.setView(dialogView)
+        
+        // 다이얼로그 크기 설정
+        alertDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        
+        alertDialog.show()
+
+        btnCancel.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        btnDelete.setOnClickListener {
+            try {
+                dbHelper.deleteCategory(category.id)
+                loadCategories()
+                Toast.makeText(context, "카테고리가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                alertDialog.dismiss()
+            } catch (e: Exception) {
+                Toast.makeText(context, "카테고리 삭제 중 오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("취소", null)
-            .show()
+        }
     }
 
     /**

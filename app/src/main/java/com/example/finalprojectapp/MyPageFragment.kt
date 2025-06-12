@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,7 +20,7 @@ import java.util.*
  */
 class MyPageFragment : Fragment() {
     // 데이터베이스 헬퍼 클래스
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DB
     // UI 요소들
     private lateinit var tvUsername: TextView
     private lateinit var tvMonthlyExpense: TextView
@@ -60,7 +59,7 @@ class MyPageFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbHelper = DatabaseHelper(requireContext())
+        dbHelper = DB(requireContext())
         username = arguments?.getString("username") ?: ""
 
         initializeViews(view)
@@ -147,7 +146,12 @@ class MyPageFragment : Fragment() {
      */
     private fun showEditProfileDialog() {
         val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_edit_profile)
+        dialog.setContentView(R.layout.dialog_edit_name)
+
+        // 다이얼로그 너비 설정
+        val window = dialog.window
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         val etNewName = dialog.findViewById<EditText>(R.id.etNewName)
         val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
@@ -182,18 +186,30 @@ class MyPageFragment : Fragment() {
      * 확인 시 로그인 화면으로 이동합니다.
      */
     private fun showLogoutConfirmDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("로그아웃")
-            .setMessage("로그아웃 하시겠습니까?")
-            .setPositiveButton("로그아웃") { _, _ ->
-                // 로그인 화면으로 이동
-                val intent = Intent(context, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                activity?.finish()
-            }
-            .setNegativeButton("취소", null)
-            .show()
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_logout)
+
+        // 다이얼로그 너비 설정
+        val window = dialog.window
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val btnCancel = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnCancel)
+        val btnLogout = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLogout)
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnLogout.setOnClickListener {
+            // 로그인 화면으로 이동
+            val intent = Intent(context, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            activity?.finish()
+        }
+
+        dialog.show()
     }
 
     /**
@@ -201,23 +217,35 @@ class MyPageFragment : Fragment() {
      * 확인 시 사용자 데이터를 삭제하고 로그인 화면으로 이동합니다.
      */
     private fun showDeleteAccountConfirmDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("회원 탈퇴")
-            .setMessage("정말로 탈퇴하시겠습니까?\n모든 데이터가 삭제됩니다.")
-            .setPositiveButton("탈퇴") { _, _ ->
-                if (dbHelper.deleteUser(username)) {
-                    Toast.makeText(context, "회원 탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    // 로그인 화면으로 이동
-                    val intent = Intent(context, LoginActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    activity?.finish()
-                } else {
-                    Toast.makeText(context, "회원 탈퇴에 실패했습니다.", Toast.LENGTH_SHORT).show()
-                }
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_delete_account)
+
+        // 다이얼로그 너비 설정
+        val window = dialog.window
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val btnCancel = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnCancel)
+        val btnDelete = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnDelete)
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnDelete.setOnClickListener {
+            if (dbHelper.deleteUser(username)) {
+                Toast.makeText(context, "회원 탈퇴가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                // 로그인 화면으로 이동
+                val intent = Intent(context, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                activity?.finish()
+            } else {
+                Toast.makeText(context, "회원 탈퇴에 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("취소", null)
-            .show()
+        }
+
+        dialog.show()
     }
 
     companion object {

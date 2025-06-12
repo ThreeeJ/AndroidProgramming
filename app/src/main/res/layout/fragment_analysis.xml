@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,7 +13,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="8dp"
-        android:background="@color/purple_500">
+        android:background="@drawable/background_1150ab">
 
         <TextView
             android:id="@+id/tvDate"
@@ -21,7 +22,7 @@
             android:layout_weight="1"
             android:textColor="@android:color/white"
             android:textSize="18sp"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="8dp" />
 
         <ImageButton
             android:id="@+id/btnDropdown"
@@ -30,7 +31,7 @@
             android:src="@android:drawable/arrow_down_float"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            android:tint="@android:color/white"/>
+            app:tint="@android:color/white" />
     </LinearLayout>
 
     <!-- 원 그래프를 감싸는 컨테이너 -->

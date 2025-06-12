@@ -30,7 +30,7 @@ import java.util.TimeZone
  */
 class HomeFragment : Fragment() {
     // 데이터베이스 헬퍼 클래스
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DB
     // 거래 내역 목록을 표시하는 어댑터
     private lateinit var transactionAdapter: TransactionAdapter
     
@@ -90,7 +90,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
-            dbHelper = DatabaseHelper(requireContext())
+            dbHelper = DB(requireContext())
             
             // 뷰 초기화
             initializeViews(view)

@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.finalprojectapp.databinding.ActivityLoginBinding
@@ -20,7 +18,7 @@ class LoginActivity : AppCompatActivity() {
     // 뷰 바인딩 객체
     private lateinit var binding: ActivityLoginBinding
     // 데이터베이스 헬퍼 클래스
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DB
     // 아이디 입력 필드
     private lateinit var etUsername: EditText
     // 비밀번호 입력 필드
@@ -35,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        dbHelper = DatabaseHelper(this)
+        dbHelper = DB(this)
         initializeViews()
         setupTextWatchers()
         setupClickListeners()
